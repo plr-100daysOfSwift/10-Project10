@@ -11,7 +11,11 @@ class ViewController: UICollectionViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		// Do any additional setup after loading the view.
+		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPerson))
+	}
+
+	@objc func addPerson() {
+
 	}
 
 	// MARK: - Collection View Data Source
