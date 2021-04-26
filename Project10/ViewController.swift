@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UICollectionViewController {
+class ViewController: UICollectionViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -15,7 +15,10 @@ class ViewController: UICollectionViewController {
 	}
 
 	@objc func addPerson() {
-
+		let picker = UIImagePickerController()
+		picker.allowsEditing = true
+		picker.delegate = self
+		present(picker, animated: true)
 	}
 
 	// MARK: - Collection View Data Source
