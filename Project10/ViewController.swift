@@ -21,6 +21,21 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		present(picker, animated: true)
 	}
 
+	// MARK: Image Picker Delegate Methods
+
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+		guard let image = info[.editedImage] as? UIImage else { return }
+
+		let imageName = UUID().uuidString
+		let imagePath = getDocumentsDirectory().appendingPathComponent(imageName)
+
+		if let jpegData = image.jpegData(compressionQuality: 0.8) {
+			try? jpegData.write(to: imagePath)
+		}
+
+		dismiss(animated: true)
+	}
+
 	// MARK: - Collection View Data Source
 
 	override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
