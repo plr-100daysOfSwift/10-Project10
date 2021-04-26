@@ -56,6 +56,10 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Person", for: indexPath) as? PersonCell else {
 			fatalError("Unable to dequeue PersonCell")
 		}
+
+		let person = people[indexPath.item]
+		cell.name.text = person.name
+
 		return cell
 	}
 
