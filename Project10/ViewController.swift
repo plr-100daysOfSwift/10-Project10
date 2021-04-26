@@ -49,7 +49,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 	// MARK: - Collection View Data Source
 
 	override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		return 10
+		return people.count
 	}
 
 	override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
