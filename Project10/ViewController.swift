@@ -91,7 +91,10 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 
 	fileprivate func rename(_ person: Person) {
 		let ac = UIAlertController(title: "Rename person", message: nil, preferredStyle: .alert)
-		ac.addTextField()
+		ac.addTextField { textfield in
+			textfield.text = person.name
+			textfield.clearButtonMode = .always
+		}
 		ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 		ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self, weak ac] _ in
 			guard let newName = ac?.textFields?[0].text  else { return }
