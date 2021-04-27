@@ -63,6 +63,11 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		let path = getDocumentsDirectory().appendingPathComponent(person.image)
 		cell.imageView.image = UIImage(contentsOfFile: path.path)
 
+		cell.imageView.layer.borderColor = UIColor(white: 0, alpha: 0.3).cgColor
+		cell.imageView.layer.borderWidth = 2
+		cell.imageView.layer.cornerRadius = 3
+		cell.layer.cornerRadius = 7
+
 		return cell
 	}
 
