@@ -14,6 +14,12 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPerson))
+		let defaults = UserDefaults.standard
+		if let savedPeople = defaults.object(forKey: "people") as? Data {
+			if let decodedPeople = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(savedPeople) as? [Person] {
+				people = decodedPeople
+			}
+		}
 	}
 
 	@objc func addPerson() {
