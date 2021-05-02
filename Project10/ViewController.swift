@@ -14,6 +14,17 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPerson))
+
+		let defaults = UserDefaults.standard
+		if let savedPeople = defaults.object(forKey: "people") as? Data {
+			let jsonDecoder = JSONDecoder()
+			do {
+				try people = jsonDecoder.decode([Person].self, from: savedPeople)
+			} catch {
+				print("Failed to load people.")
+			}
+		}
+
 	}
 
 	@objc func addPerson() {
