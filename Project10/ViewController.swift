@@ -26,6 +26,16 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		present(picker, animated: true)
 	}
 
+	func save() {
+		let jsonEncoder = JSONEncoder()
+		if let savedData = try? jsonEncoder.encode(people) {
+			let defaults = UserDefaults.standard
+			defaults.set(savedData, forKey: "people")
+		} else {
+			print("Failed to save data.")
+		}
+	}
+
 	// MARK: Image Picker Delegate Methods
 
 	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -41,6 +51,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		let person = Person(name: "Unknown", image: imageName)
 		people.append(person)
 		collectionView.reloadData()
+		save()
 		dismiss(animated: true)
 	}
 
@@ -85,6 +96,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		ac.addAction(UIAlertAction(title: "Delete", style: .destructive) { action in
 			self.people.remove(at: indexPath.item)
 			self.collectionView.reloadData()
+			self.save()
 		})
 		ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 
@@ -104,6 +116,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 			guard let newName = ac?.textFields?[0].text  else { return }
 			person.name = newName
 			self?.collectionView.reloadData()
+			self?.save()
 		})
 
 		present(ac, animated: true)
