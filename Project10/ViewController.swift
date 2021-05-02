@@ -97,6 +97,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 		ac.addTextField { textfield in
 			textfield.text = person.name
 			textfield.clearButtonMode = .always
+			textfield.autocapitalizationType = .sentences
 		}
 		ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 		ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self, weak ac] _ in
