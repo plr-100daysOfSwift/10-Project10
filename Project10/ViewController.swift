@@ -6,15 +6,41 @@
 //
 
 import UIKit
+import LocalAuthentication
 
 class ViewController: UICollectionViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
 
 	var people = [Person]()
+	var isLocked = true
+	var addButton: UIBarButtonItem!
+	var authenticateButton: UIBarButtonItem!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPerson))
+		addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPerson))
+		authenticateButton = UIBarButtonItem(title: "Authenticate", style: .plain, target: self, action: #selector(authenticate))
+		let notificationCenter = NotificationCenter.default
+		notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+		notificationCenter.addObserver(self, selector: #selector(authenticate), name: UIApplication.willEnterForegroundNotification, object: nil)
 
+		if isLocked {
+			authenticate()
+		} else {
+			navigationItem.setLeftBarButton(addButton, animated: true)
+			loadData()
+		}
+
+	}
+
+	@objc func didEnterBackground() {
+		isLocked = true
+		save()
+		people.removeAll()
+		collectionView.reloadData()
+		navigationItem.setLeftBarButton(nil, animated: true)
+	}
+
+	fileprivate func loadData() {
 		let defaults = UserDefaults.standard
 		if let savedPeople = defaults.object(forKey: "people") as? Data {
 			let jsonDecoder = JSONDecoder()
@@ -24,7 +50,43 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 				print("Failed to load people.")
 			}
 		}
+	}
 
+	@objc func authenticate() {
+		let context = LAContext()
+		var error: NSError?
+		if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+			context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Please authenticate to access the data.") { [weak self] success, authenticationError in
+				DispatchQueue.main.async {
+					if success {
+						self?.isLocked = false
+						self?.navigationItem.setLeftBarButton(self?.addButton, animated: true)
+						self?.navigationItem.setRightBarButton(nil, animated: true)
+						self?.loadData()
+						self?.collectionView.reloadData()
+					} else {
+						if let error = authenticationError {
+							switch error._code {
+							case LAError.Code.userCancel.rawValue:
+								self?.navigationItem.setRightBarButton(self?.authenticateButton, animated: true)
+							default:
+								let ac = UIAlertController(title: "Authentication failed.", message: "Your identity could not be verified; please try again.", preferredStyle: .alert)
+								ac.addAction(UIAlertAction(title: "OK", style: .default))
+								self?.present(ac, animated: true) {
+									self?.navigationItem.setRightBarButton(self?.authenticateButton, animated: true)
+								}
+							}
+						}
+					}
+				}
+			}
+		} else {
+			let ac = UIAlertController(title: "Biometry unavailable", message: "Your device is not configure for biometric authentication; please try again.", preferredStyle: .alert)
+			ac.addAction(UIAlertAction(title: "OK", style: .default))
+			present(ac, animated: true) { [weak self] in
+				self?.navigationItem.setRightBarButton(self?.authenticateButton, animated: true)
+			}
+		}
 	}
 
 	@objc func addPerson() {
@@ -38,6 +100,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
 	}
 
 	func save() {
+		guard !isLocked else { return }
 		let jsonEncoder = JSONEncoder()
 		if let savedData = try? jsonEncoder.encode(people) {
 			let defaults = UserDefaults.standard
